@@ -20,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(8px + 1.25vmin);
   color: white;
 }
 
@@ -35,4 +35,38 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.container{
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;  
+  padding: 20px;
+}
+
+.posts{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;    
+}
+
+.post{
+  background: rgb(30, 47, 66);
+  color: whitesmoke;
+  box-shadow: 0 0 10px #181a1f;   
+  transition: transform 150ms ease-in-out;
+}
+
+.post:hover{
+  transform: scale(1.05);
+}
+
+.post > img{
+  display: block;
+  max-width: 100%;
+  margin: 0 0 10px;
+}
+
+.post-content{
+  padding: 16px;
 }
