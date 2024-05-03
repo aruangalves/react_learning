@@ -1,0 +1,21 @@
+.btn{
+    width: 100%;
+    padding: 1rem 1rem;
+    margin: 2rem 0;
+    color: whitesmoke;
+    background: rgb(30, 47, 66);
+    box-shadow: 0 0 10px #181a1f;
+    border: 2px whitesmoke;
+    font-size: calc(8px + 1vmin);
+    cursor: pointer;
+  }
+
+  .btn:hover{
+    background: rgb(40, 57, 76);
+  }
+
+  .btn:disabled{
+    background: rgb(80, 77, 96);
+    color: lightgray;
+    cursor: not-allowed;
+  }
