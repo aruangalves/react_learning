@@ -5,6 +5,7 @@ import { Component } from 'react';
 import { Posts } from '../../components/Posts';
 import { loadPosts } from '../../actions/load-posts';
 import { Button } from '../../components/Button';
+import { SearchInput } from '../../components/SearchInput';
 
 class Home extends Component{
 
@@ -18,7 +19,8 @@ class Home extends Component{
       allPosts: [],
       page: 0,
       postsPerPage: 12,
-      disableButton: true
+      disableButton: true,
+      searchValue: ''
     };
 
   }  
@@ -46,7 +48,7 @@ class Home extends Component{
 
   loadMorePosts = () =>{
     const{
-      page, postsPerPage, posts, allPosts, disableButton
+      page, postsPerPage, posts, allPosts
     } = this.state;    
     let nextPage = page + postsPerPage;
     let nextPosts = allPosts.slice(nextPage, nextPage + postsPerPage);
@@ -62,8 +64,18 @@ class Home extends Component{
     await this.loadPosts();
   }
 
+  handleSearchChange = (e) =>{
+    let {value} = e.target;    
+    
+    this.setState({searchValue: value});    
+  }
+
   render(){
-    let { name, counter, updates, posts, disableButton } = this.state;
+    let { name, counter, updates, posts, disableButton, searchValue} = this.state;
+
+    const filteredPosts = !!searchValue ? posts.filter(post =>{
+      return post.title.toLowerCase().includes(searchValue.toLowerCase());
+    }) : posts;
 
     return (
       <div className="App">
@@ -82,8 +94,13 @@ class Home extends Component{
           </a>
           <p>Amount of updated states: <b>{updates}</b></p>
           <section className='container'>
-            <Posts posts={posts} />
-            <Button disabled={disableButton} onClick={this.loadMorePosts} text="Load more posts" />            
+            <div className='search-container'>
+              {!!searchValue && (<h1>Search value: {searchValue}</h1>)}
+              <SearchInput searchHandler={this.handleSearchChange} searchValue={searchValue} />            
+            </div>
+            {filteredPosts.length > 0 ? (<Posts posts={filteredPosts} />) : (<p>Não existem posts que correspondam aos termos da busca.</p>)}
+            
+            {!searchValue && (<Button disabled={disableButton} onClick={this.loadMorePosts} text="Load more posts" />)}
           </section>
           
           
