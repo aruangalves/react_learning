@@ -1,36 +1,33 @@
 import logo from './logo.svg';
 import './styles.css';
 
-import { Component } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Posts } from '../../components/Posts';
 import { loadPosts } from '../../actions/load-posts';
 import { Button } from '../../components/Button';
 import { SearchInput } from '../../components/SearchInput';
 
-class Home extends Component{
+export const Home = () => {  
 
-  constructor(props){
-    super(props);    
-    this.state = {
-      name: 'Test case #',
-      counter: 1,
-      updates: 0,
-      posts: [],
-      allPosts: [],
-      page: 0,
-      postsPerPage: 12,
-      disableButton: true,
-      searchValue: ''
-    };
+  const [name] = useState('Test case #');
+  const [counter, setCounter] = useState(1);
+  const [updates] = useState(0);
+  const [posts, setPosts] = useState([]);
+  const [allPosts, setAllPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [postsPerPage] = useState(12);
+  const [disableButton, setDisableButton] = useState(true);
+  const [searchValue, setSearchValue] = useState('');
 
-  }  
+  const filteredPosts = !!searchValue ? posts.filter(post =>{
+    return post.title.toLowerCase().includes(searchValue.toLowerCase());
+  }) : posts;
 
-  handlePClick = () => {
-    this.setState({ counter: this.state.counter+1});    
+  const handlePClick = () => {
+    setCounter(counter+1);
   }
 
-  loadPosts = async () => {
-    let { page, postsPerPage } = this.state;
+  const handleLoadPosts = useCallback (async (page, postsPerPage) => {    
     let postsAndPhotos = await loadPosts();
     let denyMorePosts = true;
 
@@ -38,18 +35,16 @@ class Home extends Component{
       denyMorePosts = false;
     }
 
-    this.setState({ 
-      posts: postsAndPhotos.slice(page, postsPerPage),
-      allPosts: postsAndPhotos,
-      disableButton: denyMorePosts
-    });
-    
-  }
+    setPosts(postsAndPhotos.slice(page, postsPerPage));
+    setAllPosts(postsAndPhotos);
+    setDisableButton(denyMorePosts);
+  }, []);
 
-  loadMorePosts = () =>{
-    const{
-      page, postsPerPage, posts, allPosts
-    } = this.state;    
+  useEffect(()=>{    
+    handleLoadPosts(0, postsPerPage);
+  }, [handleLoadPosts, postsPerPage]);
+
+  const loadMorePosts = () =>{    
     let nextPage = page + postsPerPage;
     let nextPosts = allPosts.slice(nextPage, nextPage + postsPerPage);
     posts.push(...nextPosts);
@@ -57,57 +52,48 @@ class Home extends Component{
     if(nextPage + postsPerPage > allPosts.length){
       denyMorePosts = true;
     }
-    this.setState({posts, page: nextPage, disableButton: denyMorePosts});    
+    setPosts(posts);
+    setPage(nextPage);
+    setDisableButton(denyMorePosts);
   }
 
-  async componentDidMount(){
-    await this.loadPosts();
-  }
-
-  handleSearchChange = (e) =>{
-    let {value} = e.target;    
+  const handleSearchChange = (e) =>{
+    let {value} = e.target;
     
-    this.setState({searchValue: value});    
+    setSearchValue(value);
   }
 
-  render(){
-    let { name, counter, updates, posts, disableButton, searchValue} = this.state;
-
-    const filteredPosts = !!searchValue ? posts.filter(post =>{
-      return post.title.toLowerCase().includes(searchValue.toLowerCase());
-    }) : posts;
-
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p onClick={this.handlePClick}>
-            Edit <code>src/App.js</code> and save to reload. {name}{counter}
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <p>Amount of updated states: <b>{updates}</b></p>
-          <section className='container'>
-            <div className='search-container'>
-              {!!searchValue && (<h1>Search value: {searchValue}</h1>)}
-              <SearchInput searchHandler={this.handleSearchChange} searchValue={searchValue} />            
-            </div>
-            {filteredPosts.length > 0 ? (<Posts posts={filteredPosts} />) : (<p>Não existem posts que correspondam aos termos da busca.</p>)}
-            
-            {!searchValue && (<Button disabled={disableButton} onClick={this.loadMorePosts} text="Load more posts" />)}
-          </section>
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p onClick={handlePClick}>
+          Edit <code>src/App.js</code> and save to reload. {name}{counter}
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+        <p>Amount of updated states: <b>{updates}</b></p>
+        <section className='container'>
+          <div className='search-container'>
+            {!!searchValue && (<h1>Search value: {searchValue}</h1>)}
+            <SearchInput searchHandler={handleSearchChange} searchValue={searchValue} />            
+          </div>
+          {filteredPosts.length > 0 ? (<Posts posts={filteredPosts} />) : (<p>Não existem posts que correspondam aos termos da busca.</p>)}
           
-          
-        </header>
-      </div>
-    );
-  };
-}
+          {!searchValue && (<Button disabled={disableButton} onClick={loadMorePosts} text="Load more posts" />)}
+        </section>
+        
+        
+      </header>
+    </div>
+  );
+
+};
 
 export default Home;
