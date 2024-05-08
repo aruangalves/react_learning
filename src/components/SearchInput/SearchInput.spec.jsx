@@ -1,11 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import { SearchInput } from ".";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from '@testing-library/react';
+import { SearchInput } from '.';
+import userEvent from '@testing-library/user-event';
 
 const placeholder = 'Busca por título';
 
-describe('<SearchInput />', ()=>{
-    it('should have a search value', ()=>{
+describe('<SearchInput />', () => {
+    it('should have a search value', () => {
         const fn = jest.fn();
         render(<SearchInput searchHandler={fn} searchValue={'testing'} />);
 
@@ -13,29 +13,25 @@ describe('<SearchInput />', ()=>{
 
         expect(input).toBeInTheDocument();
         expect(input.value).toBe('testing');
-
-        
     });
 
-    it('should call handleChange function on each key press', ()=>{
+    it('should call handleChange function on each key press', () => {
         const fn = jest.fn();
-        render(<SearchInput searchHandler={fn} />);
+        render(<SearchInput searchHandler={fn} searchValue={'some search value'} />);
 
         const input = screen.getByPlaceholderText(placeholder);
 
-        const value = 'some search value';
+        const testValue = 'some search value';
 
-        userEvent.type(input, value);
-        expect(input.value).toBe(value);
-        expect(fn).toHaveBeenCalledTimes(value.length);
-
-        
+        userEvent.type(input, testValue);
+        expect(input.value).toBe(testValue);
+        expect(fn).toHaveBeenCalledTimes(testValue.length);
     });
 
-    it('should match snapshot', ()=>{
+    it('should match snapshot', () => {
         const fn = jest.fn();
-        const {container} = render(<SearchInput searchHandler={fn} />);
-        const {firstChild} = container;
+        const { container } = render(<SearchInput searchHandler={fn} searchValue={''} />);
+        const { firstChild } = container;
 
         expect(firstChild).toMatchSnapshot();
     });
