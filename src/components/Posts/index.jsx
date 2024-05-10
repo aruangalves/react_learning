@@ -14,6 +14,7 @@ export const Posts = ({ posts = [] }) => {
     );
 };
 
+//redundant as posts = [] is already defined
 Posts.defaultProps = {
     posts: [],
 };
